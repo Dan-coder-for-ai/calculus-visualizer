@@ -14,10 +14,12 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.15.10",
+    "@types/react-plotly.js": "^2.6.3",
     "mathjs": "^12.3.0",
     "plotly.js-dist": "^2.27.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.22.1",
     "zustand": "^4.5.1"
   },
@@ -33,4 +35,4 @@
     "typescript": "^5.2.2",
     "vite": "^5.1.0"
   }
-} 
+}

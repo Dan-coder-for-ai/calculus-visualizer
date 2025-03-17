@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Paper,
@@ -10,14 +10,12 @@ import {
   Grid,
   Slider,
 } from '@mui/material';
+import Plot from 'react-plotly.js';
 import { useStore } from '../store/useStore';
 import { generatePoints } from '../utils/math';
 import { createBaseLayout, createFunctionTrace } from '../utils/plotting';
-import * as Plotly from 'plotly.js-dist';
 
 const FunctionPlot: React.FC = () => {
-  const plotRef = useRef<HTMLDivElement>(null);
-
   const {
     functionInput,
     setFunctionInput,
@@ -38,6 +36,9 @@ const FunctionPlot: React.FC = () => {
     addRecentFunction,
   } = useStore();
 
+  const [plotData, setPlotData] = useState<any[]>([]);
+  const [plotLayout, setPlotLayout] = useState<any>({});
+
   const plotState = {
     showGrid,
     showAxes,
@@ -49,13 +50,11 @@ const FunctionPlot: React.FC = () => {
   };
 
   useEffect(() => {
-    if (plotRef.current) {
-      const { x, y } = generatePoints(functionInput, xRange);
-      const trace = createFunctionTrace(x, y, plotState);
-      const layout = createBaseLayout(plotState);
-
-      Plotly.newPlot(plotRef.current, [trace], layout);
-    }
+    const { x, y } = generatePoints(functionInput, xRange);
+    const trace = createFunctionTrace(x, y, plotState);
+    const layout = createBaseLayout(plotState);
+    setPlotData([trace]);
+    setPlotLayout(layout);
   }, [functionInput, xRange, yRange, showGrid, showAxes, showPoints, lineWidth, pointSize]);
 
   const handlePlot = () => {
@@ -176,7 +175,12 @@ const FunctionPlot: React.FC = () => {
         </Grid>
       </Paper>
       <Paper sx={{ flex: 1, p: 2 }}>
-        <div ref={plotRef} style={{ width: '100%', height: '100%' }} />
+        <Plot
+          data={plotData}
+          layout={plotLayout}
+          style={{ width: '100%', height: '100%' }}
+          useResizeHandler={true}
+        />
       </Paper>
     </Box>
   );
