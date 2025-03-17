@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider } from '@mui/material';
 import { useStore } from './store/useStore';
 import Layout from './components/Layout';
 import FunctionPlot from './components/FunctionPlot';
@@ -26,16 +26,15 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
       <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<FunctionPlot />} />
-            <Route path="/derivatives" element={<Derivatives />} />
-            <Route path="/integrals" element={<Integrals />} />
-            <Route path="/higher-derivatives" element={<HigherDerivatives />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<FunctionPlot />} />
+            <Route path="derivatives" element={<Derivatives />} />
+            <Route path="integrals" element={<Integrals />} />
+            <Route path="higher-derivatives" element={<HigherDerivatives />} />
+          </Route>
+        </Routes>
       </Router>
     </ThemeProvider>
   );
