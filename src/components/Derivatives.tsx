@@ -25,19 +25,12 @@ const Derivatives: React.FC = () => {
     functionInput,
     setFunctionInput,
     xRange,
-    setXRange,
     yRange,
-    setYRange,
     showGrid,
-    toggleGrid,
     showAxes,
-    toggleAxes,
     showPoints,
-    togglePoints,
     lineWidth,
-    setLineWidth,
     pointSize,
-    setPointSize,
   } = useStore();
 
   const plotState = {
@@ -65,16 +58,17 @@ const Derivatives: React.FC = () => {
       const derivative = calculateDerivative(functionInput, xValue, hValue);
       setDerivativeValue(derivative);
 
+      const traces = [];
       const { x, y } = generatePoints(functionInput, xRange);
-      const traces = [createFunctionTrace(x, y, plotState)];
+      traces.push(createFunctionTrace(x, y, plotState, 'Original Function'));
 
-      if (showTangent && !isNaN(derivative)) {
-        const tangentX = [xValue - 1, xValue + 1];
-        const tangentY = [
-          evaluateFunction(functionInput, xValue) - derivative,
-          evaluateFunction(functionInput, xValue) + derivative,
-        ];
-        traces.push(createTangentLineTrace(tangentX, tangentY));
+      if (showTangent) {
+        const yValue = evaluateFunction(functionInput, xValue);
+        const { x: tangentX, y: tangentY } = generatePoints(
+          `${derivative} * (x - ${xValue}) + ${yValue}`,
+          xRange
+        );
+        traces.push(createTangentLineTrace(tangentX, tangentY, 'Tangent Line'));
       }
 
       const layout = createBaseLayout(plotState);

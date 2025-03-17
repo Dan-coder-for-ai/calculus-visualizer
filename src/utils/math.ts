@@ -1,71 +1,54 @@
 import * as math from 'mathjs';
 
-export const evaluateFunction = (func: string, x: number): number => {
+export const evaluateFunction = (functionStr: string, x: number): number => {
   try {
-    return math.evaluate(func, { x });
+    const scope = { x };
+    return math.evaluate(functionStr, scope) as number;
   } catch (error) {
     console.error('Error evaluating function:', error);
     return NaN;
   }
 };
 
-export const generatePoints = (
-  func: string,
-  xRange: [number, number],
-  numPoints: number = 200
-): { x: number[]; y: number[] } => {
+export const generatePoints = (functionStr: string, xRange: [number, number], numPoints: number = 1000): { x: number[]; y: number[] } => {
   const [xMin, xMax] = xRange;
-  const step = (xMax - xMin) / (numPoints - 1);
-  const x = Array.from({ length: numPoints }, (_, i) => xMin + i * step);
-  const y = x.map((xi) => evaluateFunction(func, xi));
+  const x = Array.from({ length: numPoints }, (_, i) => xMin + (i * (xMax - xMin)) / (numPoints - 1));
+  const y = x.map((xi) => evaluateFunction(functionStr, xi));
   return { x, y };
 };
 
-export const calculateDerivative = (
-  func: string,
-  x: number,
-  h: number = 0.0001
-): number => {
+export const calculateDerivative = (functionStr: string, x: number, h: number = 0.0001): number => {
   try {
-    return (evaluateFunction(func, x + h) - evaluateFunction(func, x)) / h;
+    const y1 = evaluateFunction(functionStr, x + h);
+    const y2 = evaluateFunction(functionStr, x - h);
+    return (y1 - y2) / (2 * h);
   } catch (error) {
     console.error('Error calculating derivative:', error);
     return NaN;
   }
 };
 
-export const calculateIntegral = (
-  func: string,
-  a: number,
-  b: number,
-  n: number = 100
-): number => {
+export const calculateIntegral = (functionStr: string, a: number, b: number, n: number = 100): number => {
   try {
     const dx = (b - a) / n;
     let sum = 0;
     for (let i = 0; i < n; i++) {
       const x = a + i * dx;
-      sum += evaluateFunction(func, x) * dx;
+      sum += evaluateFunction(functionStr, x);
     }
-    return sum;
+    return sum * dx;
   } catch (error) {
     console.error('Error calculating integral:', error);
     return NaN;
   }
 };
 
-export const calculateHigherDerivative = (
-  func: string,
-  x: number,
-  order: number,
-  h: number = 0.0001
-): number => {
+export const calculateHigherDerivative = (functionStr: string, x: number, h: number = 0.0001, order: number = 1): number => {
   try {
-    let derivative = func;
-    for (let i = 0; i < order; i++) {
-      derivative = math.derivative(derivative, 'x').toString();
+    if (order === 1) {
+      return calculateDerivative(functionStr, x, h);
     }
-    return evaluateFunction(derivative, x);
+    return calculateHigherDerivative(`(${functionStr})'`, x, h, order - 1);
   } catch (error) {
     console.error('Error calculating higher derivative:', error);
     return NaN;

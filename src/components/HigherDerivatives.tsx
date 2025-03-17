@@ -27,19 +27,12 @@ const HigherDerivatives: React.FC = () => {
     functionInput,
     setFunctionInput,
     xRange,
-    setXRange,
     yRange,
-    setYRange,
     showGrid,
-    toggleGrid,
     showAxes,
-    toggleAxes,
     showPoints,
-    togglePoints,
     lineWidth,
-    setLineWidth,
     pointSize,
-    setPointSize,
   } = useStore();
 
   const plotState = {

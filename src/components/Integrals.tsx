@@ -17,8 +17,8 @@ import * as Plotly from 'plotly.js-dist';
 
 const Integrals: React.FC = () => {
   const plotRef = useRef<HTMLDivElement>(null);
-  const [aValue, setAValue] = useState(-2);
-  const [bValue, setBValue] = useState(2);
+  const [aValue, setAValue] = useState(-1);
+  const [bValue, setBValue] = useState(1);
   const [nValue, setNValue] = useState(100);
   const [showArea, setShowArea] = useState(true);
   const [integralValue, setIntegralValue] = useState<number | null>(null);
@@ -27,19 +27,12 @@ const Integrals: React.FC = () => {
     functionInput,
     setFunctionInput,
     xRange,
-    setXRange,
     yRange,
-    setYRange,
     showGrid,
-    toggleGrid,
     showAxes,
-    toggleAxes,
     showPoints,
-    togglePoints,
     lineWidth,
-    setLineWidth,
     pointSize,
-    setPointSize,
   } = useStore();
 
   const plotState = {
@@ -67,13 +60,14 @@ const Integrals: React.FC = () => {
       const integral = calculateIntegral(functionInput, aValue, bValue, nValue);
       setIntegralValue(integral);
 
+      const traces = [];
       const { x, y } = generatePoints(functionInput, xRange);
-      const traces = [createFunctionTrace(x, y, plotState)];
+      traces.push(createFunctionTrace(x, y, plotState, 'Original Function'));
 
-      if (showArea && !isNaN(integral)) {
-        const areaX = generatePoints(functionInput, [aValue, bValue]).x;
-        const areaY = generatePoints(functionInput, [aValue, bValue]).y;
-        traces.push(createAreaTrace(areaX, areaY));
+      if (showArea) {
+        const areaX = x.filter((xi) => xi >= aValue && xi <= bValue);
+        const areaY = y.filter((_, i) => x[i] >= aValue && x[i] <= bValue);
+        traces.push(createAreaTrace(areaX, areaY, 'Area Under Curve'));
       }
 
       const layout = createBaseLayout(plotState);
@@ -95,7 +89,7 @@ const Integrals: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Typography gutterBottom>Lower Limit (a)</Typography>
+            <Typography gutterBottom>Lower Bound (a)</Typography>
             <TextField
               fullWidth
               type="number"
@@ -105,7 +99,7 @@ const Integrals: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Typography gutterBottom>Upper Limit (b)</Typography>
+            <Typography gutterBottom>Upper Bound (b)</Typography>
             <TextField
               fullWidth
               type="number"
@@ -115,12 +109,12 @@ const Integrals: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Typography gutterBottom>Number of Rectangles</Typography>
+            <Typography gutterBottom>Number of Rectangles (n)</Typography>
             <Slider
               value={nValue}
               onChange={(_, newValue) => setNValue(newValue as number)}
               min={10}
-              max={200}
+              max={1000}
               step={10}
               valueLabelDisplay="auto"
             />
@@ -133,7 +127,7 @@ const Integrals: React.FC = () => {
                   onChange={(e) => setShowArea(e.target.checked)}
                 />
               }
-              label="Show Shaded Area"
+              label="Show Area Under Curve"
             />
           </Grid>
           <Grid item xs={12}>
@@ -144,7 +138,7 @@ const Integrals: React.FC = () => {
           {integralValue !== null && (
             <Grid item xs={12}>
               <Typography variant="h6">
-                ∫({aValue} to {bValue}) f(x) dx = {integralValue.toFixed(4)}
+                ∫<sub>{aValue}</sub><sup>{bValue}</sup> f(x) dx = {integralValue.toFixed(4)}
               </Typography>
             </Grid>
           )}

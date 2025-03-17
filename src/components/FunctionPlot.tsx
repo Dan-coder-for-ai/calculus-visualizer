@@ -17,6 +17,7 @@ import * as Plotly from 'plotly.js-dist';
 
 const FunctionPlot: React.FC = () => {
   const plotRef = useRef<HTMLDivElement>(null);
+
   const {
     functionInput,
     setFunctionInput,
@@ -61,6 +62,22 @@ const FunctionPlot: React.FC = () => {
     addRecentFunction(functionInput);
   };
 
+  const handleXRangeChange = (_: Event, newValue: number | number[]) => {
+    setXRange(newValue as [number, number]);
+  };
+
+  const handleYRangeChange = (_: Event, newValue: number | number[]) => {
+    setYRange(newValue as [number, number]);
+  };
+
+  const handleLineWidthChange = (_: Event, newValue: number | number[]) => {
+    setLineWidth(newValue as number);
+  };
+
+  const handlePointSizeChange = (_: Event, newValue: number | number[]) => {
+    setPointSize(newValue as number);
+  };
+
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Paper sx={{ p: 2 }}>
@@ -74,66 +91,81 @@ const FunctionPlot: React.FC = () => {
               placeholder="e.g., x^2, sin(x), etc."
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <Typography gutterBottom>X Range</Typography>
             <Slider
               value={xRange}
-              onChange={(_, newValue) => setXRange(newValue as [number, number])}
-              valueLabelDisplay="auto"
+              onChange={handleXRangeChange}
               min={-10}
               max={10}
               step={0.1}
+              valueLabelDisplay="auto"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <Typography gutterBottom>Y Range</Typography>
             <Slider
               value={yRange}
-              onChange={(_, newValue) => setYRange(newValue as [number, number])}
-              valueLabelDisplay="auto"
+              onChange={handleYRangeChange}
               min={-10}
               max={10}
               step={0.1}
+              valueLabelDisplay="auto"
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControlLabel
-              control={<Checkbox checked={showGrid} onChange={toggleGrid} />}
-              label="Show Grid"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControlLabel
-              control={<Checkbox checked={showAxes} onChange={toggleAxes} />}
-              label="Show Axes"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControlLabel
-              control={<Checkbox checked={showPoints} onChange={togglePoints} />}
-              label="Show Points"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <Typography gutterBottom>Line Width</Typography>
             <Slider
               value={lineWidth}
-              onChange={(_, newValue) => setLineWidth(newValue as number)}
+              onChange={handleLineWidthChange}
               min={1}
               max={5}
               step={0.5}
               valueLabelDisplay="auto"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <Typography gutterBottom>Point Size</Typography>
             <Slider
               value={pointSize}
-              onChange={(_, newValue) => setPointSize(newValue as number)}
-              min={2}
+              onChange={handlePointSizeChange}
+              min={1}
               max={10}
-              step={1}
+              step={0.5}
               valueLabelDisplay="auto"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showGrid}
+                  onChange={toggleGrid}
+                />
+              }
+              label="Show Grid"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showAxes}
+                  onChange={toggleAxes}
+                />
+              }
+              label="Show Axes"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showPoints}
+                  onChange={togglePoints}
+                />
+              }
+              label="Show Points"
             />
           </Grid>
           <Grid item xs={12}>
