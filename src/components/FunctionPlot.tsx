@@ -50,11 +50,20 @@ const FunctionPlot: React.FC = () => {
   };
 
   useEffect(() => {
-    const { x, y } = generatePoints(functionInput, xRange);
-    const trace = createFunctionTrace(x, y, plotState);
-    const layout = createBaseLayout(plotState);
-    setPlotData([trace]);
-    setPlotLayout(layout);
+    try {
+      const { x, y } = generatePoints(functionInput, xRange);
+      const trace = createFunctionTrace(x, y, plotState);
+      const layout = createBaseLayout(plotState);
+      setPlotData([trace]);
+      setPlotLayout({
+        ...layout,
+        autosize: true,
+        height: 400,
+        width: undefined
+      });
+    } catch (error) {
+      console.error('Error generating plot:', error);
+    }
   }, [functionInput, xRange, yRange, showGrid, showAxes, showPoints, lineWidth, pointSize]);
 
   const handlePlot = () => {
@@ -78,7 +87,7 @@ const FunctionPlot: React.FC = () => {
   };
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Box sx={{ height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
       <Paper sx={{ p: 2 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -174,12 +183,13 @@ const FunctionPlot: React.FC = () => {
           </Grid>
         </Grid>
       </Paper>
-      <Paper sx={{ flex: 1, p: 2 }}>
+      <Paper sx={{ flex: 1, p: 2, minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
         <Plot
           data={plotData}
           layout={plotLayout}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%', minHeight: '400px' }}
           useResizeHandler={true}
+          config={{ responsive: true }}
         />
       </Paper>
     </Box>

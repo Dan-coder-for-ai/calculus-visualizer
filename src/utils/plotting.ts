@@ -1,4 +1,4 @@
-import { Data, Layout } from 'plotly.js-dist';
+import { Layout } from 'plotly.js';
 
 interface PlotState {
   showGrid: boolean;
@@ -14,12 +14,17 @@ export const createBaseLayout = (state: PlotState): Partial<Layout> => {
   const { showGrid, showAxes, xRange, yRange } = state;
   return {
     title: 'Function Visualization',
+    autosize: true,
+    height: 400,
+    margin: { t: 40, r: 20, b: 40, l: 60 },
+    showlegend: true,
     xaxis: {
       title: 'x',
       showgrid: showGrid,
       showline: showAxes,
       zeroline: showAxes,
       range: xRange,
+      visible: showAxes,
     },
     yaxis: {
       title: 'y',
@@ -27,9 +32,10 @@ export const createBaseLayout = (state: PlotState): Partial<Layout> => {
       showline: showAxes,
       zeroline: showAxes,
       range: yRange,
+      visible: showAxes,
     },
-    showlegend: true,
-    margin: { t: 40, r: 20, b: 40, l: 60 },
+    plot_bgcolor: 'transparent',
+    paper_bgcolor: 'transparent',
   };
 };
 
@@ -39,7 +45,7 @@ export const createFunctionTrace = (
   state: PlotState,
   name: string = 'f(x)',
   color: string = '#1976d2'
-): Data => {
+) => {
   const { showPoints, lineWidth, pointSize } = state;
   return {
     x,
@@ -62,7 +68,7 @@ export const createTangentLineTrace = (
   x: number[],
   y: number[],
   name: string = 'Tangent Line'
-): Data => {
+) => {
   return {
     x,
     y,
@@ -81,7 +87,7 @@ export const createAreaTrace = (
   x: number[],
   y: number[],
   name: string = 'Area'
-): Data => {
+) => {
   return {
     x,
     y,
