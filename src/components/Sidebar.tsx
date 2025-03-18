@@ -22,7 +22,7 @@ import { useStore } from '../store/useStore';
 
 interface SidebarProps {
   mobileOpen: boolean;
-  onClose: () => void;
+  onDrawerToggle: () => void;
 }
 
 const drawerWidth = 240;
@@ -35,7 +35,7 @@ const menuItems = [
   { text: 'Recent Functions', icon: <HistoryIcon />, path: '/recent' },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
               selected={location.pathname === item.path}
               onClick={() => {
                 navigate(item.path);
-                if (isMobile) onClose();
+                if (isMobile) onDrawerToggle();
               }}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
@@ -80,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
                 <ListItemButton
                   onClick={() => {
                     navigate('/');
-                    if (isMobile) onClose();
+                    if (isMobile) onDrawerToggle();
                   }}
                 >
                   <ListItemText primary={func} />
@@ -102,7 +102,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
         <Drawer
           variant="temporary"
           open={mobileOpen}
-          onClose={onClose}
+          onClose={onDrawerToggle}
           ModalProps={{
             keepMounted: true, // Better open performance on mobile.
           }}

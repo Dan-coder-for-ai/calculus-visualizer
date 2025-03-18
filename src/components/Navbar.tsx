@@ -12,9 +12,10 @@ import { useStore } from '../store/useStore';
 
 interface NavbarProps {
   onMenuClick: () => void;
+  onThemeToggle: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
+const Navbar: React.FC<NavbarProps> = ({ onMenuClick, onThemeToggle }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { isDarkMode, toggleTheme } = useStore();
@@ -36,7 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           Calculus Visualizer
         </Typography>
-        <IconButton color="inherit" onClick={toggleTheme}>
+        <IconButton color="inherit" onClick={onThemeToggle}>
           {isDarkMode ? '🌞' : '🌙'}
         </IconButton>
       </Toolbar>

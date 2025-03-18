@@ -9,7 +9,6 @@ import {
   Checkbox,
   Grid,
   Slider,
-  Alert,
   CircularProgress,
 } from '@mui/material';
 import { useStore } from '../store/useStore';

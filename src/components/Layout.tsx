@@ -5,10 +5,13 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useStore } from '../store/useStore';
 
-const Layout: React.FC = () => {
-  const theme = useTheme();
-  const isMobile = window.innerWidth < theme.breakpoints.values.sm;
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const theme = useTheme();
   const { toggleTheme } = useStore();
 
   const handleDrawerToggle = () => {
@@ -19,7 +22,10 @@ const Layout: React.FC = () => {
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <CssBaseline />
       <Navbar onMenuClick={handleDrawerToggle} onThemeToggle={toggleTheme} />
-      <Sidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
+      <Sidebar
+        mobileOpen={mobileOpen}
+        onDrawerToggle={handleDrawerToggle}
+      />
       <Box
         component="main"
         sx={{
@@ -30,7 +36,7 @@ const Layout: React.FC = () => {
           mt: '64px',
         }}
       >
-        <Outlet />
+        {children}
       </Box>
     </Box>
   );
