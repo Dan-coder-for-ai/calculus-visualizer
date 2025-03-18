@@ -15,7 +15,7 @@
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.15.10",
     "@types/react-plotly.js": "^2.6.3",
-    "mathjs": "^12.3.0",
+    "mathjs": "^12.4.3",
     "plotly.js-dist": "^2.35.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
