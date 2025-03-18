@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import {
   Box,
   Paper,
@@ -10,11 +10,14 @@ import {
   Grid,
   Slider,
   Alert,
+  CircularProgress,
 } from '@mui/material';
-import Plot from 'react-plotly.js';
 import { useStore } from '../store/useStore';
 import { generatePoints } from '../utils/math';
 import { createBaseLayout, createFunctionTrace } from '../utils/plotting';
+
+// Dynamically import Plotly
+const Plot = lazy(() => import('react-plotly.js'));
 
 const FunctionPlot: React.FC = () => {
   const {
@@ -45,6 +48,10 @@ const FunctionPlot: React.FC = () => {
 
   useEffect(() => {
     setIsMounted(true);
+    // Try to initialize plot with a simple function
+    if (!functionInput) {
+      setFunctionInput('x^2');
+    }
   }, []);
 
   const plotState = {
@@ -67,16 +74,19 @@ const FunctionPlot: React.FC = () => {
       }
 
       const { x, y } = generatePoints(functionInput, xRange);
+      if (x.length === 0 || y.length === 0) {
+        throw new Error('No valid points generated for the function');
+      }
+
       const trace = createFunctionTrace(x, y, plotState);
       const layout = createBaseLayout(plotState);
       
       setPlotData([trace]);
       setPlotLayout({
         ...layout,
-        autosize: true,
-        height: 400,
         width: undefined,
-        responsive: true,
+        height: undefined,
+        autosize: true,
       });
       
       setIsPlotting(false);
@@ -218,36 +228,47 @@ const FunctionPlot: React.FC = () => {
         </Grid>
       </Paper>
       <Paper sx={{ flex: 1, p: 2, minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
-        {isMounted && plotData.length > 0 ? (
-          <Plot
-            data={plotData}
-            layout={plotLayout}
-            style={{ width: '100%', height: '100%', minHeight: '400px' }}
-            useResizeHandler={true}
-            config={{ 
-              responsive: true,
-              displayModeBar: true,
-              displaylogo: false,
-            }}
-            onInitialized={() => {
-              console.log('Plot initialized');
-            }}
-            onError={(err: Error) => {
-              console.error('Plot error:', err);
-              setError('Error rendering plot');
-            }}
-          />
-        ) : (
+        <Suspense fallback={
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
-            height: '100%',
-            color: 'text.secondary'
+            height: '100%' 
           }}>
-            <Typography>Enter a function and click "Plot Function" to visualize</Typography>
+            <CircularProgress />
           </Box>
-        )}
+        }>
+          {isMounted && plotData.length > 0 ? (
+            <Plot
+              data={plotData}
+              layout={plotLayout}
+              style={{ width: '100%', height: '100%' }}
+              useResizeHandler={true}
+              config={{ 
+                responsive: true,
+                displayModeBar: true,
+                displaylogo: false,
+              }}
+              onInitialized={() => {
+                console.log('Plot initialized');
+              }}
+              onError={(err: Error) => {
+                console.error('Plot error:', err);
+                setError('Error rendering plot');
+              }}
+            />
+          ) : (
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              height: '100%',
+              color: 'text.secondary'
+            }}>
+              <Typography>Enter a function and click "Plot Function" to visualize</Typography>
+            </Box>
+          )}
+        </Suspense>
       </Paper>
     </Box>
   );
