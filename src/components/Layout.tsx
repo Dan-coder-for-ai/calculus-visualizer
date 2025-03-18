@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Box, CssBaseline, useTheme } from '@mui/material';
-import { Outlet } from 'react-router-dom';
+import { Box, CssBaseline } from '@mui/material';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useStore } from '../store/useStore';
@@ -11,7 +10,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const theme = useTheme();
   const { toggleTheme } = useStore();
 
   const handleDrawerToggle = () => {
