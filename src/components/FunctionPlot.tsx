@@ -9,6 +9,7 @@ import {
   Checkbox,
   Grid,
   Slider,
+  Alert,
 } from '@mui/material';
 import Plot from 'react-plotly.js';
 import { useStore } from '../store/useStore';
@@ -38,6 +39,13 @@ const FunctionPlot: React.FC = () => {
 
   const [plotData, setPlotData] = useState<any[]>([]);
   const [plotLayout, setPlotLayout] = useState<any>({});
+  const [error, setError] = useState<string | null>(null);
+  const [isPlotting, setIsPlotting] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const plotState = {
     showGrid,
@@ -49,24 +57,44 @@ const FunctionPlot: React.FC = () => {
     pointSize,
   };
 
-  useEffect(() => {
+  const updatePlot = () => {
     try {
+      setError(null);
+      setIsPlotting(true);
+      
+      if (!functionInput.trim()) {
+        throw new Error('Please enter a function');
+      }
+
       const { x, y } = generatePoints(functionInput, xRange);
       const trace = createFunctionTrace(x, y, plotState);
       const layout = createBaseLayout(plotState);
+      
       setPlotData([trace]);
       setPlotLayout({
         ...layout,
         autosize: true,
         height: 400,
-        width: undefined
+        width: undefined,
+        responsive: true,
       });
+      
+      setIsPlotting(false);
     } catch (error) {
       console.error('Error generating plot:', error);
+      setError(error instanceof Error ? error.message : 'Error generating plot');
+      setIsPlotting(false);
     }
-  }, [functionInput, xRange, yRange, showGrid, showAxes, showPoints, lineWidth, pointSize]);
+  };
+
+  useEffect(() => {
+    if (isMounted && functionInput.trim()) {
+      updatePlot();
+    }
+  }, [isMounted, functionInput, xRange, yRange, showGrid, showAxes, showPoints, lineWidth, pointSize]);
 
   const handlePlot = () => {
+    updatePlot();
     addRecentFunction(functionInput);
   };
 
@@ -97,6 +125,8 @@ const FunctionPlot: React.FC = () => {
               value={functionInput}
               onChange={(e) => setFunctionInput(e.target.value)}
               placeholder="e.g., x^2, sin(x), etc."
+              error={!!error}
+              helperText={error}
             />
           </Grid>
           <Grid item xs={12}>
@@ -177,20 +207,47 @@ const FunctionPlot: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" onClick={handlePlot}>
-              Plot Function
+            <Button 
+              variant="contained" 
+              onClick={handlePlot}
+              disabled={isPlotting}
+            >
+              {isPlotting ? 'Plotting...' : 'Plot Function'}
             </Button>
           </Grid>
         </Grid>
       </Paper>
       <Paper sx={{ flex: 1, p: 2, minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
-        <Plot
-          data={plotData}
-          layout={plotLayout}
-          style={{ width: '100%', height: '100%', minHeight: '400px' }}
-          useResizeHandler={true}
-          config={{ responsive: true }}
-        />
+        {isMounted && plotData.length > 0 ? (
+          <Plot
+            data={plotData}
+            layout={plotLayout}
+            style={{ width: '100%', height: '100%', minHeight: '400px' }}
+            useResizeHandler={true}
+            config={{ 
+              responsive: true,
+              displayModeBar: true,
+              displaylogo: false,
+            }}
+            onInitialized={() => {
+              console.log('Plot initialized');
+            }}
+            onError={(err: Error) => {
+              console.error('Plot error:', err);
+              setError('Error rendering plot');
+            }}
+          />
+        ) : (
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            height: '100%',
+            color: 'text.secondary'
+          }}>
+            <Typography>Enter a function and click "Plot Function" to visualize</Typography>
+          </Box>
+        )}
       </Paper>
     </Box>
   );

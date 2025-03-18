@@ -5,8 +5,10 @@ export const evaluateFunction = (functionStr: string, x: number): number => {
     if (!functionStr.trim()) {
       return NaN;
     }
+    // Sanitize the input to prevent injection attacks
+    const sanitizedFunction = functionStr.replace(/[^x0-9+\-*/^()\s.,]/g, '');
     const scope = { x };
-    const result = math.evaluate(functionStr, scope);
+    const result = math.evaluate(sanitizedFunction, scope);
     return typeof result === 'number' ? result : NaN;
   } catch (error) {
     console.error('Error evaluating function:', error);
@@ -32,7 +34,15 @@ export const generatePoints = (
       const yi = evaluateFunction(functionStr, xi);
       return Number.isFinite(yi) ? yi : NaN;
     });
-    return { x, y };
+    
+    // Filter out any NaN values to ensure the plot is continuous
+    const validPoints = x.map((xi, i) => ({ x: xi, y: y[i] }))
+      .filter(point => !Number.isNaN(point.y));
+    
+    return {
+      x: validPoints.map(point => point.x),
+      y: validPoints.map(point => point.y)
+    };
   } catch (error) {
     console.error('Error generating points:', error);
     return { x: [], y: [] };

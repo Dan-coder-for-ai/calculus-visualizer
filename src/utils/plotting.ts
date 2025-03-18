@@ -1,4 +1,4 @@
-import { Layout } from 'plotly.js';
+import { Layout } from 'plotly.js-dist';
 
 interface PlotState {
   showGrid: boolean;
@@ -14,8 +14,6 @@ export const createBaseLayout = (state: PlotState): Partial<Layout> => {
   const { showGrid, showAxes, xRange, yRange } = state;
   return {
     title: 'Function Visualization',
-    autosize: true,
-    height: 400,
     margin: { t: 40, r: 20, b: 40, l: 60 },
     showlegend: true,
     xaxis: {
@@ -24,7 +22,6 @@ export const createBaseLayout = (state: PlotState): Partial<Layout> => {
       showline: showAxes,
       zeroline: showAxes,
       range: xRange,
-      visible: showAxes,
     },
     yaxis: {
       title: 'y',
@@ -32,10 +29,7 @@ export const createBaseLayout = (state: PlotState): Partial<Layout> => {
       showline: showAxes,
       zeroline: showAxes,
       range: yRange,
-      visible: showAxes,
     },
-    plot_bgcolor: 'transparent',
-    paper_bgcolor: 'transparent',
   };
 };
 
@@ -47,6 +41,20 @@ export const createFunctionTrace = (
   color: string = '#1976d2'
 ) => {
   const { showPoints, lineWidth, pointSize } = state;
+  
+  // If there are no valid points, return an empty trace
+  if (x.length === 0 || y.length === 0) {
+    return {
+      x: [],
+      y: [],
+      name,
+      type: 'scatter',
+      mode: 'lines',
+      line: { color, width: lineWidth },
+      marker: { size: pointSize, color },
+    };
+  }
+
   return {
     x,
     y,
@@ -56,11 +64,17 @@ export const createFunctionTrace = (
     line: {
       color,
       width: lineWidth,
+      shape: 'linear',
     },
     marker: {
       size: pointSize,
       color,
+      line: {
+        color: '#fff',
+        width: 1,
+      },
     },
+    hoverinfo: 'x+y',
   };
 };
 
