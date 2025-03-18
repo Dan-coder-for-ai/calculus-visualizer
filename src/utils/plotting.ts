@@ -10,73 +10,34 @@ interface PlotState {
   pointSize: number;
 }
 
-export const createBaseLayout = (state: PlotState): Partial<Layout> => {
-  const { showGrid, showAxes, xRange, yRange } = state;
-  return {
-    title: 'Function Visualization',
-    margin: { t: 40, r: 20, b: 40, l: 60 },
-    showlegend: true,
-    xaxis: {
-      title: 'x',
-      showgrid: showGrid,
-      showline: showAxes,
-      zeroline: showAxes,
-      range: xRange,
-    },
-    yaxis: {
-      title: 'y',
-      showgrid: showGrid,
-      showline: showAxes,
-      zeroline: showAxes,
-      range: yRange,
-    },
-  };
-};
+export const createBaseLayout = (plotState: any) => ({
+  title: 'Function Plot',
+  xaxis: {
+    title: 'x',
+    range: plotState.xRange,
+    showgrid: plotState.showGrid,
+    showline: plotState.showAxes,
+    zeroline: plotState.showAxes,
+  },
+  yaxis: {
+    title: 'y',
+    range: plotState.yRange,
+    showgrid: plotState.showGrid,
+    showline: plotState.showAxes,
+    zeroline: plotState.showAxes,
+  },
+  showlegend: false,
+  autosize: true,
+  margin: { t: 40, b: 40, l: 40, r: 40 },
+});
 
-export const createFunctionTrace = (
-  x: number[],
-  y: number[],
-  state: PlotState,
-  name: string = 'f(x)',
-  color: string = '#1976d2'
-) => {
-  const { showPoints, lineWidth, pointSize } = state;
-  
-  // If there are no valid points, return an empty trace
-  if (x.length === 0 || y.length === 0) {
-    return {
-      x: [],
-      y: [],
-      name,
-      type: 'scatter',
-      mode: 'lines',
-      line: { color, width: lineWidth },
-      marker: { size: pointSize, color },
-    };
-  }
-
-  return {
-    x,
-    y,
-    name,
-    type: 'scatter',
-    mode: showPoints ? 'lines+markers' : 'lines',
-    line: {
-      color,
-      width: lineWidth,
-      shape: 'linear',
-    },
-    marker: {
-      size: pointSize,
-      color,
-      line: {
-        color: '#fff',
-        width: 1,
-      },
-    },
-    hoverinfo: 'x+y',
-  };
-};
+export const createFunctionTrace = (x: number[], y: number[], plotState: any) => ({
+  x,
+  y,
+  type: 'scatter',
+  mode: 'lines',
+  line: { color: '#1976d2' },
+});
 
 export const createTangentLineTrace = (
   x: number[],

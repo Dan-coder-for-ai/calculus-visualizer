@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import {
   Box,
   Paper,
@@ -12,7 +12,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useStore } from '../store/useStore';
-import { generatePoints } from '../utils/math';
+import { generatePoints, evaluateFunction } from '../utils/mathUtils';
 import { createBaseLayout, createFunctionTrace } from '../utils/plotting';
 
 // Dynamically import Plotly
@@ -42,7 +42,7 @@ const FunctionPlot: React.FC = () => {
   const [plotData, setPlotData] = useState<any[]>([]);
   const [plotLayout, setPlotLayout] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
-  const [isPlotting, setIsPlotting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -63,21 +63,21 @@ const FunctionPlot: React.FC = () => {
     pointSize,
   };
 
-  const updatePlot = () => {
+  const updatePlot = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      setError(null);
-      setIsPlotting(true);
-      
-      if (!functionInput.trim()) {
-        throw new Error('Please enter a function');
+      const points = generatePoints(functionInput, xRange[0], xRange[1]);
+      if (!points || points.length === 0) {
+        throw new Error('No valid points generated');
       }
 
-      const { x, y } = generatePoints(functionInput, xRange);
-      if (x.length === 0 || y.length === 0) {
-        throw new Error('No valid points generated for the function');
+      const yValues = points.map(point => evaluateFunction(functionInput, point));
+      if (yValues.some(y => y === null || isNaN(y))) {
+        throw new Error('Invalid function values');
       }
 
-      const trace = createFunctionTrace(x, y, plotState);
+      const trace = createFunctionTrace(points, yValues, plotState);
       const layout = createBaseLayout(plotState);
       
       setPlotData([trace]);
@@ -88,11 +88,11 @@ const FunctionPlot: React.FC = () => {
         autosize: true,
       });
       
-      setIsPlotting(false);
-    } catch (error) {
-      console.error('Error generating plot:', error);
-      setError(error instanceof Error ? error.message : 'Error generating plot');
-      setIsPlotting(false);
+      addRecentFunction(functionInput);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error plotting function');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -104,7 +104,6 @@ const FunctionPlot: React.FC = () => {
 
   const handlePlot = () => {
     updatePlot();
-    addRecentFunction(functionInput);
   };
 
   const handleXRangeChange = (_: Event, newValue: number | number[]) => {
@@ -130,12 +129,12 @@ const FunctionPlot: React.FC = () => {
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Function f(x)"
+              label="Enter function (e.g., x^2, sin(x), exp(x))"
               value={functionInput}
               onChange={(e) => setFunctionInput(e.target.value)}
-              placeholder="e.g., x^2, sin(x), etc."
               error={!!error}
               helperText={error}
+              sx={{ mb: 2 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -143,10 +142,11 @@ const FunctionPlot: React.FC = () => {
             <Slider
               value={xRange}
               onChange={handleXRangeChange}
-              min={-10}
-              max={10}
+              min={-20}
+              max={20}
               step={0.1}
               valueLabelDisplay="auto"
+              sx={{ mb: 2 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -154,10 +154,11 @@ const FunctionPlot: React.FC = () => {
             <Slider
               value={yRange}
               onChange={handleYRangeChange}
-              min={-10}
-              max={10}
+              min={-20}
+              max={20}
               step={0.1}
               valueLabelDisplay="auto"
+              sx={{ mb: 2 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -219,9 +220,9 @@ const FunctionPlot: React.FC = () => {
             <Button 
               variant="contained" 
               onClick={handlePlot}
-              disabled={isPlotting}
+              disabled={isLoading}
             >
-              {isPlotting ? 'Plotting...' : 'Plot Function'}
+              {isLoading ? <CircularProgress size={24} /> : 'Plot Function'}
             </Button>
           </Grid>
         </Grid>
