@@ -1,9 +1,8 @@
 import { createTheme } from '@mui/material/styles';
-import { useStore } from './store/useStore';
 
-const getTheme = (isDarkMode: boolean) => createTheme({
+export const theme = createTheme({
   palette: {
-    mode: isDarkMode ? 'dark' : 'light',
+    mode: 'light',
     primary: {
       main: '#1976d2',
     },
@@ -11,6 +10,4 @@ const getTheme = (isDarkMode: boolean) => createTheme({
       main: '#dc004e',
     },
   },
-});
-
-export const theme = getTheme(false); // Default to light theme 
+}); 

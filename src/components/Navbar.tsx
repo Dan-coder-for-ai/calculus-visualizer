@@ -18,7 +18,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onMenuClick, onThemeToggle }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { isDarkMode, toggleTheme } = useStore();
+  const isDarkMode = useStore((state) => state.isDarkMode);
 
   return (
     <AppBar position="fixed">

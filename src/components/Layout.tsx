@@ -10,7 +10,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { toggleTheme } = useStore();
+  const toggleTheme = useStore((state) => state.toggleTheme);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
