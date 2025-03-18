@@ -60,7 +60,7 @@ const Derivatives: React.FC = () => {
 
       const traces = [];
       const { x, y } = generatePoints(functionInput, xRange);
-      traces.push(createFunctionTrace(x, y, plotState, 'Original Function'));
+      traces.push(createFunctionTrace(x, y, plotState));
 
       if (showTangent) {
         const yValue = evaluateFunction(functionInput, xValue);
@@ -68,7 +68,7 @@ const Derivatives: React.FC = () => {
           `${derivative} * (x - ${xValue}) + ${yValue}`,
           xRange
         );
-        traces.push(createTangentLineTrace(tangentX, tangentY, 'Tangent Line'));
+        traces.push(createTangentLineTrace(tangentX, tangentY));
       }
 
       const layout = createBaseLayout(plotState);
